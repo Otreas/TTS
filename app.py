@@ -42,7 +42,6 @@ def upload():
         selected_lang = request.form.get('selected_language')
         audio_data = request.files['audio'].read()
         filename = save_audio(audio_data)
-        print("Selected language:", selected_lang)
         result = whispermodel.transcribe(r"whisperaudios/temp.wav", language=selected_lang)
         print(result["text"])
         return jsonify({'success': True, 'text': result["text"]})
@@ -54,9 +53,7 @@ def upload():
 def generate_tts_file(model_name, text, selected_lang):
     czas = datetime.now()
     date_time = czas.strftime("%d-%m-%Y_%H-%M-%S")
-    print(model_name)
     result = re.sub(r".*\\", "", model_name)
-    print(result)
     # Use the global tts_model and device
     global tts_model, device
 
