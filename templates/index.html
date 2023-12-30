@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="author" content="The one and only O.S.A.G">
+    <title>Generator</title>
+    <link rel="shortcut icon" href="#">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            height: 100vh;
+            margin: 0;
+        }
+	#audio-container
+{
+position:absolute;
+top:40vh;
+}
+        #form1 {
+	    top:1vh;
+	    position: absolute;
+            text-align: center;
+            padding: 20px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin: 10px 0;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 15px;
+            box-sizing: border-box;
+        }
+
+        #button1 {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+
+        h2 {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        audio {
+            width: 100%;
+            margin-top: 10px;
+        }
+        .microphone
+        {
+            position: absolute;
+            top:12.2vh;
+        }
+        .mic
+        {
+            width: 2vw;
+            height: 2.5vh;
+        }
+    </style>
+</head>
+<body>
+    <form id="form1" method="POST" action="/">
+        <h1>Generator głosów 1.3 (NO SCAM)</h1>
+        <label for="text_input">Tekst:</label>
+        <input type="text" id="text_input" name="text_input" required autocomplete="off">
+        <button id="startRecordingButton" class="microphone" type="button" onclick="startRecording()"><img class="mic" src="static/micon-modified.png"></button>
+        <button id="stopButton" class="microphone" type="button" style="display:none;" onclick="stopRecording()"><img class="mic" src="static/micoff-modified.png"></button>
+        <br>
+        <label for="selected_file">Osoba:</label>
+        <select id="selected_file" name="selected_file" required>
+    {% for file in voice_files %}
+        <option value="{{ file }}" {% if file == default_voice %}selected{% endif %}>{{ file }}</option>
+    {% endfor %}
+        </select>
+        <br>
+        <label for="selected_language">Język:</label>
+<select id="selected_language" name="selected_language" required>
+    <option value="pl" {% if default_language == 'pl' %}selected{% endif %}>Polish (pl)</option>
+    <option value="en" {% if default_language == 'en' %}selected{% endif %}>English (en)</option>
+    <option value="es" {% if default_language == 'es' %}selected{% endif %}>Spanish (es)</option>
+    <option value="fr" {% if default_language == 'fr' %}selected{% endif %}>French (fr)</option>
+    <option value="de" {% if default_language == 'de' %}selected{% endif %}>German (de)</option>
+    <option value="it" {% if default_language == 'it' %}selected{% endif %}>Italian (it)</option>
+    <option value="pt" {% if default_language == 'pt' %}selected{% endif %}>Portuguese (pt)</option>
+    <option value="tr" {% if default_language == 'tr' %}selected{% endif %}>Turkish (tr)</option>
+    <option value="ru" {% if default_language == 'ru' %}selected{% endif %}>Russian (ru)</option>
+    <option value="nl" {% if default_language == 'nl' %}selected{% endif %}>Dutch (nl)</option>
+    <option value="cs" {% if default_language == 'cs' %}selected{% endif %}>Czech (cs)</option>
+    <option value="ar" {% if default_language == 'ar' %}selected{% endif %}>Arabic (ar)</option>
+    <option value="zh-cn" {% if default_language == 'zh-cn' %}selected{% endif %}>Chinese (zh-cn)</option>
+    <option value="ja" {% if default_language == 'ja' %}selected{% endif %}>Japanese (ja)</option>
+    <option value="hu" {% if default_language == 'hu' %}selected{% endif %}>Hungarian (hu)</option>
+    <option value="ko" {% if default_language == 'ko' %}selected{% endif %}>Korean (ko)</option>
+</select>
+<br>
+        <button id="button1" type="submit">Wygeneruj</button>
+        <br>
+    </form>
+
+<div id="audio-container" class="lazy-audio-container">
+    <h2>Wygenerowane:</h2>
+    {% for file in audio_files %}
+        <div class="lazy-audio">
+            <p>{{ file }}</p>
+            <!-- Add a data-src attribute for the source URL -->
+            <audio controls data-src="outputs\{{ file }}" class="lazy-audio-element">
+                Your browser does not support the audio element.
+            </audio>
+            <form method="post" action="{{ url_for('delete_file', filename=file) }}" style="display: block;" style="height:25px;">
+                <button type="submit" style="position: relative; background-color: #ff4444; color: white; border: none; border-radius: 3px; cursor: pointer; left:40%">Usuń</button>
+            </form>
+        </div>
+    {% endfor %}
+</div>
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        var lazyAudios = document.querySelectorAll('.lazy-audio-element');
+
+        function loadLazyAudio(element) {
+            if (element.getAttribute('data-src')) {
+                element.src = element.getAttribute('data-src');
+                element.removeAttribute('data-src');
+            }
+        }
+
+        function handleIntersection(entries, observer) {
+            entries.forEach(function (entry) {
+                if (entry.isIntersecting) {
+                    var lazyAudio = entry.target;
+                    loadLazyAudio(lazyAudio);
+                    observer.unobserve(lazyAudio);
+                }
+            });
+        }
+
+        var audioObserver = new IntersectionObserver(handleIntersection, { threshold: 0.5 });
+
+        lazyAudios.forEach(function (lazyAudio) {
+            audioObserver.observe(lazyAudio);
+        });
+    });
+</script>
+ <script>
+    let mediaRecorder;
+    let audioChunks = [];
+
+    function startRecording() {
+        navigator.mediaDevices.getUserMedia({ audio: true })
+            .then(function (stream) {
+                mediaRecorder = new MediaRecorder(stream);
+
+                mediaRecorder.ondataavailable = function (event) {
+                    if (event.data.size > 0) {
+                        audioChunks.push(event.data);
+                    }
+                };
+
+                mediaRecorder.onstop = function () {
+                    const blob = new Blob(audioChunks, { type: 'audio/wav' });
+                    sendAudioToServer(blob);
+                    audioChunks = [];
+                };
+
+                document.getElementById('stopButton').style.display = 'inline-block';
+                document.getElementById('startRecordingButton').style.display = 'none';
+
+                mediaRecorder.start();
+            })
+            .catch(function (err) {
+                console.error('Error accessing microphone: ', err);
+            });
+    }
+
+    function stopRecording() {
+        mediaRecorder.stop();
+        document.getElementById('stopButton').style.display = 'none';
+        document.getElementById('startRecordingButton').style.display = 'inline-block';
+    }
+
+
+    function sendAudioToServer(blob) {
+        const formData = new FormData();
+        formData.append('audio', blob, 'recorded_audio.wav');
+        let language = document.getElementById('selected_language').value;
+        formData.append('selected_language', language);
+
+        fetch('/upload', {
+            method: 'POST',
+            body: formData,
+        })
+        .then(response => {
+            if (response.ok) {
+                return response.json();
+            }
+            throw new Error('Failed to upload audio');
+        })
+        .then(data => {
+            if (data.success) {
+                // Update the webpage with the transcribed text
+                document.getElementById('text_input').value = data.text;
+            } else {
+                console.error('Error uploading audio:', data.error);
+            }
+        })
+        .catch(error => {
+            console.error('Error uploading audio:', error);
+        });
+    }
+</script>
+</body>
+</html>
