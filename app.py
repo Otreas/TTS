@@ -24,6 +24,16 @@ global selected_lang
 selected_file = "None"
 selected_lang="pl"
 
+
+def create_folders_if_not_exist():
+    folders = ['voices', 'outputs', 'whisperaudios']
+
+    for folder in folders:
+        if not os.path.exists(folder):
+            os.makedirs(folder)
+            print(f"Folder '{folder}' created.")
+
+
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
@@ -114,6 +124,7 @@ def delete_file(filename):
 
 if __name__ == '__main__':
     try:
+        create_folders_if_not_exist()
         app.run(debug=True)
     except KeyboardInterrupt:
         print("Server terminated by user. Exiting...")
