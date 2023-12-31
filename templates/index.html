@@ -122,7 +122,6 @@ top:40vh;
     {% for file in audio_files %}
         <div class="lazy-audio">
             <p>{{ file }}</p>
-            <!-- Add a data-src attribute for the source URL -->
             <audio controls data-src="outputs\{{ file }}" class="lazy-audio-element">
                 Your browser does not support the audio element.
             </audio>
