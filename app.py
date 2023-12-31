@@ -2,7 +2,7 @@ from flask import Flask, render_template, request, send_from_directory, redirect
 import subprocess
 import os
 import torch
-from TTS.api import TTS  # Assuming TTS is imported from the correct location
+from TTS.api import TTS
 from datetime import datetime
 from werkzeug.utils import secure_filename
 import re
@@ -15,7 +15,6 @@ ALLOWED_EXTENSIONS = {'wav'}
 app = Flask(__name__)
 app.config['UPLOAD_FOLDER'] = 'outputs'
 
-# Load TTS model and device
 device = "cuda" if torch.cuda.is_available() else "cpu"
 whispermodel = whisper.load_model("large")
 tts_model = TTS("tts_models/multilingual/multi-dataset/xtts_v2").to(device)
@@ -64,17 +63,14 @@ def generate_tts_file(model_name, text, selected_lang):
     czas = datetime.now()
     date_time = czas.strftime("%d-%m-%Y_%H-%M-%S")
     result = re.sub(r".*\\", "", model_name)
-    # Use the global tts_model and device
     global tts_model, device
-
-    # Perform TTS and save to file
     tts_model.tts_to_file(text, speaker_wav="voices/"+model_name, language=selected_lang, file_path="outputs/"+date_time+"_"+result)
 
 
 @app.route('/', methods=['GET', 'POST'])
 def index():
-    default_voice = request.form.get('selected_file', 'default_voice')  # Replace 'default_voice' with the default voice filename
-    default_language = request.form.get('selected_language', 'pl')  # Replace 'pl' with the default language code
+    default_voice = request.form.get('selected_file', 'default_voice')
+    default_language = request.form.get('selected_language', 'pl')
 
     if request.method == 'POST':
         text_input = request.form['text_input']
@@ -116,10 +112,8 @@ def delete_file(filename):
     file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
     if os.path.exists(file_path):
         os.remove(file_path)
-        # Redirect to the main page after deleting the file
         return redirect(url_for('index'))
     else:
-        # Handle error or display a message
         return "File not found."
 
 if __name__ == '__main__':
