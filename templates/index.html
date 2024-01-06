@@ -19,7 +19,7 @@
 	#audio-container
 {
 position:absolute;
-top:40vh;
+top:50vh;
 }
         #form1 {
 	    top:1vh;
@@ -86,6 +86,9 @@ top:40vh;
         <button id="startRecordingButton" class="microphone" type="button" onclick="startRecording()"><img class="mic" src="static/micon-modified.png"></button>
         <button id="stopButton" class="microphone" type="button" style="display:none;" onclick="stopRecording()"><img class="mic" src="static/micoff-modified.png"></button>
         <br>
+        <label for="file_input">Wybierz plik audio:</label>
+        <input type="file" id="file_input" name="file_input" accept=".wav, .mp3, .ogg">
+        <button id="uploadButton" type="button" onclick="uploadFile()">Prześlij plik</button>
         <label for="selected_file">Osoba:</label>
         <select id="selected_file" name="selected_file" required>
     {% for file in voice_files %}
@@ -199,7 +202,7 @@ top:40vh;
 
     function sendAudioToServer(blob) {
         const formData = new FormData();
-        formData.append('audio', blob, 'recorded_audio.wav');
+        formData.append('audio', blob, 'recor                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               ded_audio.wav');
         let language = document.getElementById('selected_language').value;
         formData.append('selected_language', language);
 
@@ -225,6 +228,39 @@ top:40vh;
             console.error('Error uploading audio:', error);
         });
     }
+    function uploadFile() {
+    const fileInput = document.getElementById('file_input');
+    const file = fileInput.files[0];
+
+    if (file) {
+        const formData = new FormData();
+        formData.append('audio', file);
+
+        fetch('/upload_file', {
+            method: 'POST',
+            body: formData,
+        })
+        .then(response => {
+            if (response.ok) {
+                return response.json();
+            }
+            throw new Error('Failed to upload file');
+        })
+        .then(data => {
+            if (data.success) {
+                console.log('File uploaded successfully:', data.filename);
+                location.reload()
+                // Optionally, you can do something with the uploaded file information
+            } else {
+                console.error('Error uploading file:', data.error);
+            }
+        })
+        .catch(error => {
+            console.error('Error uploading file:', error);
+        });
+    }
+}
+
 </script>
 </body>
 </html>
